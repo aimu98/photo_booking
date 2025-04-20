@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+staticfiles/
+
+__pycache__/
+staticfiles/
