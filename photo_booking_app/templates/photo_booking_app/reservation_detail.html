@@ -1,0 +1,6 @@
+<h1>予約詳細</h1>
+<p>予約日: {{ reservation.date }}</p>
+<p>時間: {{ reservation.start_time }} 〜 {{ reservation.end_time }}</p>
+<p>プラン: {{ reservation.plan }}</p>
+<p>ステータス: {{ reservation.status }}</p>
+<a href="{% url 'edit_reservation' reservation.id %}">編集</a>

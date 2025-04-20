@@ -1,0 +1,130 @@
+/* ======= 全体共通設定 ======= */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ======= ヘッダー / ナビゲーション ======= */
+header .navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.nav-link {
+    margin-left: 15px;
+}
+
+/* ======= フッター ======= */
+footer {
+    background-color: #f1f1f1;
+    color: #666;
+}
+
+/* ======= ログイン・フォーム共通 ======= */
+.form-container,
+.login-form,
+.reset-form {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+form .form-control {
+    margin-bottom: 15px;
+}
+
+/* ======= ボタン ======= */
+.btn-primary,
+.btn-outline-primary {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+}
+
+.btn-cancel {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    background-color: transparent;
+}
+
+.btn-cancel:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* ======= パスワードリセット ======= */
+.reset-link {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+/* ======= 予約履歴・マイページ ======= */
+.history-table,
+.dashboard-table {
+    width: 100%;
+    margin: 30px auto;
+    background-color: white;
+    border-collapse: collapse;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.history-table th,
+.history-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.history-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+/* ======= 成功・エラー メッセージ ======= */
+.alert-success {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.alert-danger {
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* ======= カレンダー入力エリアなど ======= */
+.reservation-form input[type="date"],
+.reservation-form select {
+    padding: 8px;
+    margin-bottom: 1rem;
+}
+
+/* ======= レスポンシブ ======= */
+@media (max-width: 768px) {
+    .navbar-nav {
+        text-align: center;
+    }
+}

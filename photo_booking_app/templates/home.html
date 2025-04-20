@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ホーム{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <h1>📸 撮影予約サービスへようこそ！</h1>
+    <p>ログインや予約は
+        <a href="{% url 'login' %}" class="btn btn-primary btn-sm">こちら</a>
+    から行えます。</p>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+<h1>予約管理ダッシュボード</h1>
+
+<table>
+    <tr>
+        <th>予約日</th>
+        <th>時間</th>
+        <th>プラン</th>
+        <th>ステータス</th>
+    </tr>
+    {% for reservation in reservations %}
+        <tr>
+            <td>{{ reservation.date }}</td>
+            <td>{{ reservation.start_time }} 〜 {{ reservation.end_time }}</td>
+            <td>{{ reservation.plan }}</td>
+            <td>{{ reservation.status }}</td>
+        </tr>
+    {% endfor %}
+</table>

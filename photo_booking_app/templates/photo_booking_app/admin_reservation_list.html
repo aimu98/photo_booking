@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>管理者用：予約一覧</title>
+</head>
+<body>
+    <h1>予約一覧（管理者用）</h1>
+
+    <form method="GET" action="{% url 'admin_reservation_list' %}">
+        <label for="user">ユーザーを選択:</label>
+        <select name="user" id="user">
+            <option value="">全てのユーザー</option>
+            {% for user in users %}
+                <option value="{{ user.id }}" {% if request.GET.user == user.id|stringformat:"s" %}selected{% endif %}>
+                    {{ user.username }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">表示</button>
+    </form>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ユーザー</th>
+                <th>予約日時</th>
+                <th>プラン</th>
+                <th>お名前</th>
+                <th>お子様のお名前</th>
+                <th>編集日時</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+                <tr>
+                    <td>{{ reservation.user.username }}</td>
+                    <td>{{ reservation.date }} {{ reservation.start_time }} ～ {{ reservation.end_time }}</td>
+                    <td>{{ reservation.plan }}</td>
+                    <td>{{ reservation.name }}</td>
+                    <td>{{ reservation.children_name }}</td>
+                    <td>{{ reservation.updated_at }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'admin:index' %}">管理画面に戻る</a>
+</body>
+</html>

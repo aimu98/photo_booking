@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ログイン{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="text-center mt-3">
+    <a href="{% url 'password_reset' %}" class="btn btn-outline-primary w-100 mt-3">
+        🔐 パスワードを忘れた方はこちら
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+
+{% extends "base.html" %}
+{% block title %}予約完了{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <!-- 🎉 アニメーション付きチェックマーク -->
+    <div class="mb-4">
+        <svg class="text-success" width="80" height="80" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.293 10.293l-2-2 1.414-1.414L6.293 7.586l4.293-4.293 1.414 1.414-5.707 5.707z"/>
+        </svg>
+    </div>
+
+    <!-- 🎉 成功メッセージ -->
+    <h2 class="text-success mb-3">ご予約が完了しました！</h2>
+    <p class="mb-4">確認メールをお送りしました。予約内容はマイページからご確認いただけます。</p>
+
+    <!-- 🎯 ボタン -->
+    <a href="{% url 'mypage' %}" class="btn btn-primary me-2">マイページへ</a>
+</div>
+
+<!-- 🎊 紙吹雪アニメーション（外部ライブラリ） -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+    // ページ読み込み後に1回だけ紙吹雪発射🎉
+    window.onload = () => {
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+    };
+</script>
+{% endblock %}
