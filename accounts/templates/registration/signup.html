@@ -1,14 +1,84 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}新規登録{% endblock %}
 
-{% block content %}
-    <h2 class="mb-4">新規登録</h2>
-    
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-custom w-100">登録する</button>
-    </form>
-{% endblock %}
+{% block show_header %}{% endblock %}
 
+{% block content %}
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to right, #fceabb, #f8b500); /* 柔らかいオレンジ系のグラデーション */
+        font-family: 'Helvetica Neue', sans-serif;
+    }
+
+    .register-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90vh;
+    }
+
+    .register-box {
+        background-color: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .register-box h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .register-box button {
+        background-color: #f8b500;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+
+    .register-box button:hover {
+        background-color: #e0a800;
+    }
+
+    .errorlist {
+        color: red;
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="register-wrapper">
+    <div class="register-box">
+        <h2>新規登録</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form %}
+                <div style="margin-bottom: 15px;">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="errorlist">
+                            {{ field.errors|striptags }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div style="text-align: center;">
+                <button type="submit">登録する</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

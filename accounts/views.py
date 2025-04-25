@@ -7,16 +7,19 @@ from django.shortcuts import render, redirect,get_object_or_404
 from photo_booking_app.models import Reservation
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash, logout
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from photo_booking_app.forms import CustomUserCreationForm
 
 def signup_view(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('login')  # 登録後ログインページへ
+            return redirect('login')
     else:
-        form = UserCreationForm()
-    return render(request, 'registration/signup.html', {'form': form})
+        form = CustomUserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form, 'hide_header': True})
 
 @login_required
 def dashboard(request):

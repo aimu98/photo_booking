@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
-from .forms import ReservationForm, AvailableSlotForm,ReservationEditForm
-from .models import Reservation , AvailableSlot
+from .forms import ReservationForm, AvailableSlotForm,ReservationEditForm, CustomUserCreationForm
+from .models import Reservation , AvailableSlot, User
 from datetime import datetime, time, timedelta , date
 from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
@@ -13,23 +13,69 @@ from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.views import LogoutView
-from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.views import LogoutView, PasswordResetView
+from django.contrib.auth.forms import PasswordResetForm,UserCreationForm
 from django.contrib.auth.tokens import default_token_generator
-from django.urls import reverse
+from django.urls import reverse,reverse_lazy
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes 
 from django.contrib.auth import get_user_model
+from django.views.generic import CreateView
 
+
+@login_required
 def reservation_form(request):
+    print(f"リクエストメソッド: {request.method}") 
     if request.method == 'POST':
         form = ReservationForm(request.POST)
         if form.is_valid():
-            form.save()
+            reservation = form.save(commit=False)
+            reservation.user = request.user
+            reservation.save()
+            
+            print(f"予約が保存されました: {reservation.id} - {reservation.name} - {reservation.date} - {reservation.start_time}")
+
+            
+
+            # ログインユーザーのメールアドレスを取得
+            user_email = request.user.email
+
+            # お客様への確認メール
+            send_mail(
+                subject='【撮影予約完了のお知らせ】',
+                message = f"""      
+                    {request.user.first_name} 様
+
+                    以下の内容でご予約を承りました。
+
+                    日付: {reservation.date}
+                    時間: {reservation.start_time}〜{reservation.end_time}
+                    プラン: {reservation.plan}
+
+                    ご不明点があればご連絡ください。
+                    """,
+                from_email='no-reply@example.com',
+                recipient_list=[user_email],
+            )
+
+            # 管理者への通知メール
+            send_mail(
+                subject='【新しい予約が入りました】',
+                message=f"新しい予約が入りました。\nお名前：{reservation.name}\n日付：{reservation.date}\n時間：{reservation.start_time}\nプラン：{reservation.plan}",
+                from_email='no-reply@example.com',
+                recipient_list=['your_admin_email@example.com'],  # 管理者メールアドレス
+            )
+
             return redirect('reservation_done')
+        else:
+            print(form.errors)  # エラー内容を表示
+            return render(request, 'photo_booking_app/reservation_form.html', {'form': form})
+        
     else:
         form = ReservationForm()
+        
     return render(request, 'photo_booking_app/reservation_form.html', {'form': form})
 
 def reservation_done(request):
@@ -70,7 +116,7 @@ def add_available_slot(request):
         form = AvailableSlotForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('admin_available_slots')  # 予約可能日時の一覧ページにリダイレクト
+            return redirect('add_available_slots') 
     else:
         form = AvailableSlotForm()
 
@@ -98,45 +144,13 @@ def add_event_to_google_calendar(reservation):
     
 @login_required
 def reservation_history(request):
-    today = date.today()
+    today = timezone.localdate()
     reservations = Reservation.objects.filter(user=request.user)
+
     return render(request, 'photo_booking_app/reservation_history.html', {
         'reservations': reservations,
-        'today': today,
+        'today': today
     })
-
-@login_required
-def reservation_view(request):
-    if request.method == 'POST':
-        form = ReservationForm(request.POST)
-        if form.is_valid():
-            reservation = form.save(commit=False)
-            reservation.user = request.user  
-            reservation.save()
-
-             # ✅ メール送信（お客様宛）
-            send_mail(
-                subject='【予約完了】撮影予約が確定しました',
-                message=f'{request.user.username}様\n\n以下の内容で撮影予約が確定しました。\n\n日付: {reservation.date}\n時間: {reservation.start_time}〜{reservation.end_time}\nプラン: {reservation.plan}\n\n当日お待ちしております！',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[request.user.email],
-                fail_silently=False,
-            )
-
-            # ✅ メール送信（管理者宛）
-            send_mail(
-                subject='【通知】新しい撮影予約が入りました',
-                message=f'{request.user.username}様より撮影予約が入りました。\n\n日付: {reservation.date}\n時間: {reservation.start_time}〜{reservation.end_time}\nプラン: {reservation.plan}\n\n管理画面で確認してください。',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[settings.ADMIN_EMAIL],  # または [admin@example.com]
-                fail_silently=False,
-            )
-
-            messages.success(request, '予約が完了しました。確認メールを送信しました。')
-            return redirect('reservation_done')
-    else:
-        form = ReservationForm()
-    return render(request, 'photo_booking_app/reservation_form.html', {'form': form})
 
   
 @require_POST  
@@ -167,15 +181,6 @@ def test_mail(request):
     )
     return HttpResponse("テストメールを送信しました！")
 
-@login_required
-def reservation_history(request):
-    today = timezone.localdate()
-    reservations = Reservation.objects.filter(user=request.user)
-
-    return render(request, 'accounts/reservation_history.html', {
-        'reservations': reservations,
-        'today': today
-    })
 
 
 def reservation_detail(request, reservation_id):
@@ -218,18 +223,18 @@ def edit_reservation(request, reservation_id):
 
 @staff_member_required
 def admin_reservation_dashboard(request):
-    reservations = Reservation.objects.all()
+    reservations = Reservation.objects.all().order_by('-date', '-start_time')
+    print(reservations)  # データが正しく取得されているかコンソールで確認
     return render(request, 'photo_booking_app/admin_dashboard.html', {'reservations': reservations})
 
 def admin_reservation_list(request, user_id=None):
-     
     users = User.objects.all()
-     
     if user_id:
         reservations = Reservation.objects.filter(user__id=user_id).order_by('-date', '-start_time')
     else:
         reservations = Reservation.objects.all().order_by('-date', '-start_time')
 
+    print(reservations)  # データが正しく取得されているかコンソールで確認
     return render(request, 'photo_booking_app/admin_reservation_list.html', {'reservations': reservations})
 
 def logout_done(request):
@@ -246,21 +251,21 @@ def password_reset_request(request):
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                pass 
-            
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(user.pk.encode())
-            domain = get_current_site(request).domain
-            link = reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
-            reset_url = f'http://{domain}{link}'
-            
-            
-            subject = "パスワードリセットリンク"
-            message = render_to_string('password_reset_email.html', {
-                'reset_url': reset_url,
-            })
-            send_mail(subject, message, 'no-reply@example.com', [email])
-            return redirect('password_reset_done')
+                user = None  
+
+            if user:
+                token = default_token_generator.make_token(user)
+                uid = urlsafe_base64_encode(force_bytes(user.pk)) 
+                domain = get_current_site(request).domain
+                link = reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
+                reset_url = f'http://{domain}{link}'
+
+                subject = "パスワードリセットリンク"
+                message = render_to_string('password_reset_email.html', {
+                    'reset_url': reset_url,
+                })
+                send_mail(subject, message, 'no-reply@example.com', [email])
+                return redirect('password_reset_done')
     else:
         form = PasswordResetForm()
     return render(request, 'password_reset_request.html', {'form': form})

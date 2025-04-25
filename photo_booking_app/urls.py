@@ -1,12 +1,13 @@
 
-from django.urls import path
+from django.urls import path, reverse_lazy
 from . import views
 from photo_booking_app import views
 from django.contrib.auth.views import LogoutView
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.home, name='home'), 
-    path('reservation/', views.reservation_view, name='reservation'),
+    path('reservation/', views.reservation_form, name='reservation'),
     path('reservation/done/', views.reservation_done, name='reservation_done'),
     path('api/available-times/', views.get_available_times, name='get_available_times'),
     path('api/available-dates/', views.get_available_dates, name='get_available_dates'),
@@ -23,7 +24,22 @@ urlpatterns = [
     path('logout/done/', views.logout_done, name='logout_done'),
     path('password_reset/', views.password_reset_request, name='password_reset'), 
     path('password_reset/done/', views.password_reset_done, name='password_reset_done'), 
-    path('password_reset/confirm/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'), 
-    path('password_reset/complete/', views.password_reset_complete, name='password_reset_complete'), 
+     path(
+        'reset/<uidb64>/<token>/',
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name='password_reset_confirm.html',
+            success_url=reverse_lazy('login')  
+        ),
+        name='password_reset_confirm'
+    ),
+    path(
+        'reset/done/',
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name='password_reset_complete.html'
+        ),
+        name='password_reset_complete'
+    ),
     
 ]
+
+

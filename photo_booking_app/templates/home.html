@@ -4,14 +4,16 @@
 {% block title %}ホーム{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5 text-center">
-    <h1>📸 撮影予約サービスへようこそ！</h1>
-    <p>ログインや予約は
-        <a href="{% url 'login' %}" class="btn btn-primary btn-sm">こちら</a>
-    から行えます。</p>
+<div class="main-center">
+    <div class="container text-center">
+        <h1>撮影予約サービスへようこそ！</h1>
+        <p>ログインや予約は
+            <a href="{% url 'login' %}" class="btn btn-primary btn-sm">こちら</a>
+        から行えます。</p>
+    </div>
 </div>
 {% endblock %}

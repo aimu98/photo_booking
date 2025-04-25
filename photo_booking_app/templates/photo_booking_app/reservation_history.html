@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}予約履歴{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">📅 {{ user.username }} さんの予約履歴</h2>
+
+    {% if reservations %}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>日付・時間</th>
+                    <th>プラン</th>
+                    <th>保護者名</th>
+                    <th>お子様名</th>
+                    <th>キャンセル</th>
+                    <th>編集</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                <tr>
+                    <td>
+                        {{ reservation.date|date:"Y年m月d日 (D)" }}<br>
+                        {{ reservation.start_time|time:"H:i" }}〜{{ reservation.end_time|time:"H:i" }}
+                    </td>
+                    <td>{{ reservation.get_plan_display }}</td>
+                    <td>{{ reservation.name }}</td>
+                    <td>{{ reservation.children_name }}</td>
+                    <td>
+                        {% if reservation.can_cancel %}
+                        <form method="POST" action="{% url 'cancel_reservation' reservation.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm w-100">🚫 キャンセル</button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted">キャンセル不可</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if reservation.can_edit %}
+                        <a href="{% url 'edit_reservation' reservation.id %}" class="btn btn-success btn-sm w-100">✏️ 編集</a>
+                        {% else %}
+                        <span class="text-muted">編集不可</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center">予約履歴はありません。</p>
+    {% endif %}
+</div>
+{% endblock %}
